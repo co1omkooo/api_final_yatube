@@ -1,6 +1,7 @@
 from django.shortcuts import get_object_or_404
 from rest_framework import permissions, viewsets, filters, mixins
 from rest_framework.pagination import LimitOffsetPagination
+from rest_framework.permissions import IsAuthenticatedOrReadOnly
 
 from api.permissions import IsAuthorOrReadOnly
 from api.serializers import (
@@ -23,7 +24,7 @@ class PostViewSet(viewsets.ModelViewSet):
     queryset = Post.objects.all()
     serializer_class = PostSerializer
     pagination_class = LimitOffsetPagination
-    permission_classes = [IsAuthorOrReadOnly]
+    permission_classes = [IsAuthorOrReadOnly, IsAuthenticatedOrReadOnly]
 
     def perform_create(self, serializer):
         """Создает запись, где автором является пользователем из запроса."""
@@ -42,11 +43,11 @@ class CommentViewSet(viewsets.ModelViewSet):
     """Вьюсет получает записи и изменения комментариев."""
 
     serializer_class = CommentSerializer
-    permission_classes = [IsAuthorOrReadOnly]
+    permission_classes = [IsAuthorOrReadOnly, IsAuthenticatedOrReadOnly]
 
     def get_post(self):
         """Получение поста."""
-        post_id = self.kwargs.get('post_id')
+        post_id = self.kwargs['post_id']
         return get_object_or_404(Post, id=post_id)
 
     def perform_create(self, serializer):
